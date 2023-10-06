@@ -19,7 +19,8 @@ spec <- matrix(c(
   'relaxed.constraints', 'r', 2, "logical", "Save final model as unconstraint network (i.e. all exchange reactions are open). Default: FALSE",
   'environment', 'e', 2, "character", "Adjusting reaction directions according to specific environmental conditions. See documentation for details. CAUTION: experimental option!",
   'write.cs.ferm', 'w', 2, "logical", "Write a list with found carbon sources and fermentation products",
-  'min.obj.val', 'k', 2, "numeric", "Minimum growth rate that should be achieved by gap-filling. Default: 0.05"
+  'min.obj.val', 'k', 2, "numeric", "Minimum growth rate that should be achieved by gap-filling. Default: 0.05",
+  'n_threads', 'K', 2, "numeric", "Number of threads to be used."
 ), ncol = 5, byrow = T)
 
 opt <- getopt(spec)
@@ -40,12 +41,18 @@ if (!is.na(Sys.getenv("RSTUDIO", unset = NA))) {
     script.dir  <- dirname(script.name)
 }
 
+if (is.null(opt$n_threads) == TRUE) {
+  n_threads=1
+} else{
+  n_threads=opt$n_threads
+}
+
 if( "cplexAPI" %in% installed.packages() )
   suppressMessages(library(cplexAPI))
 if( "sybilSBML" %in% installed.packages() )
   suppressMessages(library(sybilSBML))
 suppressMessages(library(sybil))
-suppressMessages(library(data.table)); setDTthreads(1)
+suppressMessages(library(data.table)); setDTthreads(n_threads)
 suppressMessages(library(stringr))
 suppressMessages(library(methods))
 suppressMessages(library(tools))
